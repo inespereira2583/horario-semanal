@@ -24,21 +24,20 @@
   body{margin:0;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;}
   h1,h2,h3{font-family:'Bebas Neue',sans-serif;letter-spacing:0.03em;font-weight:400;margin:0;}
   .mono{font-family:'JetBrains Mono',monospace;}
-
-  /* Auth Screen Styles */
-  #auth-container{
+  
+  /* Auth Screen */
+  #auth-screen{
     display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;
   }
   .auth-card{
     background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
-    padding:32px;max-width:400px;width:100%;box-shadow:0 10px 30px rgba(0,0,0,0.5);
+    padding:32px;width:100%;max-width:400px;box-shadow:0 10px 30px rgba(0,0,0,0.5);
   }
-  .auth-card h2{font-size:32px;color:var(--accent);margin-bottom:8px;text-align:center;}
-  .auth-card p{color:var(--text-dim);font-size:13px;margin-bottom:20px;text-align:center;}
-  .auth-toggle{margin-top:16px;text-align:center;font-size:13px;color:var(--text-dim);}
-  .auth-toggle a{color:var(--accent);text-decoration:none;cursor:pointer;font-weight:600;}
+  .auth-card h2{font-size:36px;color:var(--accent);margin-bottom:8px;text-align:center;}
+  .auth-card p{color:var(--text-dim);font-size:14px;margin-bottom:24px;text-align:center;}
 
   #app{display:none;min-height:100vh;}
+  #app.active{display:flex;}
   .sidebar{
     width:220px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--line);
     padding:24px 16px;display:flex;flex-direction:column;gap:6px;
@@ -46,16 +45,14 @@
   .brand{margin-bottom:20px;}
   .brand h1{font-size:26px;color:var(--accent);line-height:1;}
   .brand span{display:block;font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.15em;margin-top:4px;}
-  .user-info{
-    margin-top:auto;padding-top:16px;border-top:1px solid var(--line);font-size:12px;color:var(--text-dim);
-  }
-  .user-info div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:8px;}
   .nav-btn{
     background:transparent;border:none;color:var(--text-dim);text-align:left;padding:11px 12px;border-radius:8px;
     font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:10px;
   }
   .nav-btn:hover{background:var(--surface-2);color:var(--text);}
   .nav-btn.active{background:var(--accent);color:#101014;}
+  .nav-btn.logout{margin-top:auto;color:var(--danger);}
+  .nav-btn.logout:hover{background:rgba(255,111,111,0.1);color:var(--danger);}
   .content{flex:1;padding:28px 32px;max-width:1200px;}
   .view{display:none;}
   .view.active{display:block;}
@@ -64,18 +61,18 @@
   .view-head p{color:var(--text-dim);font-size:13px;margin:4px 0 0;}
   .btn{
     background:var(--accent);color:#101014;border:none;padding:10px 16px;border-radius:8px;font-weight:700;
-    font-size:13px;cursor:pointer;font-family:'Inter',sans-serif;
+    font-size:13px;cursor:pointer;font-family:'Inter',sans-serif;width:100%;text-align:center;
   }
   .btn:hover{background:var(--accent-dim);}
   .btn.secondary{background:var(--surface-2);color:var(--text);border:1px solid var(--line);}
   .btn.danger{background:transparent;color:var(--danger);border:1px solid var(--danger);}
-  .btn.small{padding:6px 10px;font-size:12px;}
+  .btn.small{padding:6px 10px;font-size:12px;width:auto;}
   .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin-bottom:14px;}
   .card-row{display:flex;justify-content:space-between;align-items:center;gap:12px;}
   .card-row + .card-row{margin-top:10px;}
   .empty-state{color:var(--text-dim);font-size:13px;padding:24px;text-align:center;border:1px dashed var(--line);border-radius:var(--radius);}
   label{display:block;font-size:12px;color:var(--text-dim);margin-bottom:5px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;}
-  input[type=text],input[type=email],input[type=password],input[type=number],input[type=time],input[type=week],select{
+  input[type=text],input[type=password],input[type=email],input[type=number],input[type=time],input[type=week],select{
     width:100%;background:var(--surface-2);border:1px solid var(--line);color:var(--text);padding:9px 10px;
     border-radius:7px;font-size:14px;font-family:inherit;
   }
@@ -132,7 +129,7 @@
     .aluno-chip{background:#eee;color:#000;}
   }
   @media (max-width:800px){
-    #app{flex-direction:column;}
+    #app.active{flex-direction:column;}
     .sidebar{width:100%;flex-direction:row;overflow-x:auto;padding:12px;}
     .brand{display:none;}
     .content{padding:18px;}
@@ -143,30 +140,25 @@
 </head>
 <body>
 
-<!-- Authentication Overlay Container -->
-<div id="auth-container">
+<div id="auth-screen">
   <div class="auth-card">
-    <h2 id="auth-title">Entrar</h2>
-    <p id="auth-subtitle">Introduza as suas credenciais para aceder ao sistema</p>
-    <form id="auth-form">
+    <h2>PLANNER</h2>
+    <p>Inicia sessão para gerir os horários do ginásio</p>
+    <form id="login-form">
       <div class="field">
         <label>Email</label>
-        <input type="email" id="auth-email" required placeholder="exemplo@ginasio.com">
+        <input type="email" id="login-email" required placeholder="exemplo@ginasio.com">
       </div>
       <div class="field">
         <label>Palavra-passe</label>
-        <input type="password" id="auth-password" required placeholder="••••••••">
+        <input type="password" id="login-password" required placeholder="••••••••">
       </div>
-      <button type="submit" class="btn" style="width:100%;margin-top:10px;" id="auth-submit-btn">Entrar</button>
+      <button type="submit" class="btn" id="btn-login" style="margin-top:12px;">Entrar</button>
+      <div id="login-error" style="color:var(--danger);font-size:12px;margin-top:12px;text-align:center;"></div>
     </form>
-    <div class="auth-toggle">
-      <span id="auth-toggle-text">Não tem uma conta?</span>
-      <a id="auth-toggle-btn">Registar</a>
-    </div>
   </div>
 </div>
 
-<!-- Main Application Interface -->
 <div id="app">
   <aside class="sidebar">
     <div class="brand"><h1>PLANNER</h1><span>Horários do Ginásio</span></div>
@@ -174,11 +166,7 @@
     <button class="nav-btn" data-view="pts">👤 PTs</button>
     <button class="nav-btn" data-view="alunos">📋 Alunos</button>
     <button class="nav-btn" data-view="horario">🗓 Horário Semanal</button>
-    
-    <div class="user-info">
-      <div id="user-display-email">utilizador@email.com</div>
-      <button class="btn secondary small" id="btn-logout" style="width:100%;">Sair</button>
-    </div>
+    <button class="nav-btn logout" id="btn-logout">🚪 Sair</button>
   </aside>
   <main class="content">
 
@@ -193,7 +181,7 @@
         </div>
         <div id="ginasio-dias"></div>
         <div class="top-actions" style="margin-top:14px;">
-          <button class="btn" id="btn-save-ginasio">Guardar</button>
+          <button class="btn small" id="btn-save-ginasio">Guardar</button>
         </div>
       </div>
       <div class="card">
@@ -214,7 +202,7 @@
     <section class="view" id="view-pts">
       <div class="view-head">
         <div><h2>Personal Trainers</h2><p>Nº de PTs, horário de trabalho de cada um e quantos alunos podem ter por sessão.</p></div>
-        <button class="btn" id="btn-add-pt">+ Novo PT</button>
+        <button class="btn small" id="btn-add-pt">+ Novo PT</button>
       </div>
       <div id="pts-list"></div>
     </section>
@@ -222,7 +210,7 @@
     <section class="view" id="view-alunos">
       <div class="view-head">
         <div><h2>Alunos</h2><p>PT fixo (ou qualquer), sessões necessárias por semana, e disponibilidade semanal.</p></div>
-        <button class="btn" id="btn-add-aluno">+ Novo Aluno</button>
+        <button class="btn small" id="btn-add-aluno">+ Novo Aluno</button>
       </div>
       <div id="alunos-list"></div>
     </section>
@@ -239,8 +227,8 @@
           <label>Semana</label>
           <input type="week" id="input-semana">
         </div>
-        <button class="btn" id="btn-gerar">Gerar Horário desta Semana</button>
-        <button class="btn secondary" id="btn-ajustes-semana">Ajustes de disponibilidade (só esta semana)</button>
+        <button class="btn small" id="btn-gerar">Gerar Horário desta Semana</button>
+        <button class="btn secondary small" id="btn-ajustes-semana">Ajustes de disponibilidade (só esta semana)</button>
       </div>
       <div id="warnings-box"></div>
       <div class="pt-tabs" id="pt-tabs"></div>
@@ -251,42 +239,26 @@
 </div>
 <div id="modal-root"></div>
 
-<!-- Firebase Modular SDK -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { 
-    getAuth, 
-    createUserWithEmailAndPassword, 
-    signInWithEmailAndPassword, 
-    signOut, 
-    onAuthStateChanged 
-  } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-  import { 
-    getFirestore, 
-    doc, 
-    getDoc, 
-    setDoc, 
-    onSnapshot 
-  } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
+  import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+  import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-  // IMPORTANTE: Substiua os valores abaixo pelas credenciais da sua consola Firebase
   const firebaseConfig = {
-  apiKey: "AIzaSyBLTxgJByKEOZeB3IQ1SGFFC9kw5OjdDG4",
-  authDomain: "horario-semanal-2f655.firebaseapp.com",
-  projectId: "horario-semanal-2f655",
-  storageBucket: "horario-semanal-2f655.firebasestorage.app",
-  messagingSenderId: "657949423982",
-  appId: "1:657949423982:web:136f000ab39dbd229be97f",
-  measurementId: "G-EY122F3W88"
-};
+    apiKey: "AIzaSyBLTxgJByKEOZeB3IQ1SGFFC9kw5OjdDG4",
+    authDomain: "horario-semanal-2f655.firebaseapp.com",
+    projectId: "horario-semanal-2f655",
+    storageBucket: "horario-semanal-2f655.firebasestorage.app",
+    messagingSenderId: "657949423982",
+    appId: "1:657949423982:web:136f000ab39dbd229be97f",
+    measurementId: "G-EY122F3W88"
+  };
 
   const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
   const auth = getAuth(app);
   const db = getFirestore(app);
-
-  // Global variables attached to window for compatibility with non-module listeners if needed
-  let currentUser = null;
-  let unsubscribeSnapshot = null;
 
   const DIAS = [
     {key:'seg',label:'Segunda'},{key:'ter',label:'Terça'},{key:'qua',label:'Quarta'},
@@ -300,47 +272,14 @@
       qui:{open:'07:00',close:'22:00'}, sex:{open:'07:00',close:'22:00'}, sab:{open:'09:00',close:'13:00'}, dom:{open:null,close:null}
     }
   };
-  
   let state = { config: defaultConfig, pts: [], alunos: [], grupos: [], ajustes: {}, horarios: {} };
   let currentPtTab = null;
+  let unsubscribeSnapshot = null;
 
   function hasAnyAvailability(disponibilidade){ return DIAS.some(d=>((disponibilidade&&disponibilidade[d.key])||[]).length>0); }
   function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
   function toMin(t){ if(!t) return null; const [h,m]=t.split(':').map(Number); return h*60+m; }
   function toTime(m){ const h=Math.floor(m/60).toString().padStart(2,'0'); const mm=(m%60).toString().padStart(2,'0'); return h+':'+mm; }
-
-  // ---------- FIREBASE PERSISTENCE ----------
-  async function saveDataToFirestore() {
-    if (!currentUser) return;
-    try {
-      const userDocRef = doc(db, 'users', currentUser.uid, 'data', 'gymData');
-      await setDoc(userDocRef, state);
-      return { ok: true };
-    } catch (err) {
-      console.error("Erro ao guardar dados no Firestore:", err);
-      return { ok: false, error: err };
-    }
-  }
-
-  function setupDataListener(userId) {
-    if (unsubscribeSnapshot) unsubscribeSnapshot();
-    const userDocRef = doc(db, 'users', userId, 'data', 'gymData');
-    
-    unsubscribeSnapshot = onSnapshot(userDocRef, (docSnap) => {
-      if (docSnap.exists()) {
-        const fetchedData = docSnap.data();
-        state = Object.assign({ config: defaultConfig, pts: [], alunos: [], grupos: [], ajustes: {}, horarios: {} }, fetchedData);
-        migrateGruposToDuo();
-        renderAll();
-      } else {
-        // Inicializa o documento pela primeira vez se não existir
-        saveDataToFirestore();
-      }
-    }, (error) => {
-      console.error("Erro na escuta do Firestore:", error);
-      showToast("Erro de sincronização de dados", false);
-    });
-  }
 
   function showToast(msg, ok=true){
     const el = document.createElement('div');
@@ -354,97 +293,62 @@
     }, ok ? 2600 : 5000);
   }
 
-  async function migrateGruposToDuo(){
-    if(!state.grupos || state.grupos.length===0) return;
-    let changed = false;
-    const normalizeMembros = (m)=> (m||[]).map(x=> typeof x==='string' ? {alunoId:null, nome:x} : x);
-    state.grupos.forEach(g=>{
-      const membros = normalizeMembros(g.membros);
-      if(membros.length!==2) return;
-      const resolvedIds = membros.map(m=>{
-        if(m.alunoId){ const ex = state.alunos.find(a=>a.id===m.alunoId); if(ex) return ex.id; }
-        const porNome = state.alunos.find(a=>a.nome.trim().toLowerCase()===m.nome.trim().toLowerCase() && !a.duoParceiroId);
-        if(porNome) return porNome.id;
-        const novo = { id: uid(), nome:m.nome, ptFixo:g.ptFixo||'qualquer', sessoesPorSemana:g.sessoesPorSemana||2,
-          aceitaGrupo:!!g.aceitaMaisAlunos, disponibilidade: JSON.parse(JSON.stringify(g.disponibilidade||{})), duoParceiroId:null };
-        state.alunos.push(novo); changed = true;
-        return novo.id;
-      });
-      const [idA, idB] = resolvedIds;
-      const aA = state.alunos.find(a=>a.id===idA), aB = state.alunos.find(a=>a.id===idB);
-      if(aA && aB && aA.id!==aB.id){ aA.duoParceiroId = aB.id; aB.duoParceiroId = aA.id; changed = true; }
-    });
-    state.grupos = [];
-    if(changed){ await saveDataToFirestore(); }
+  // --- FIREBASE SYNC ---
+  async function saveStateToFirebase(){
+    try {
+      await setDoc(doc(db, "ginasio_data", "geral"), state);
+      return { ok: true };
+    } catch(e) {
+      console.error(e);
+      return { ok: false };
+    }
   }
 
-  // ---------- AUTHENTICATION LOGIC ----------
-  let isLoginMode = true;
-  const authContainer = document.getElementById('auth-container');
-  const appContainer = document.getElementById('app');
-  const authForm = document.getElementById('auth-form');
-  const authTitle = document.getElementById('auth-title');
-  const authSubtitle = document.getElementById('auth-subtitle');
-  const authSubmitBtn = document.getElementById('auth-submit-btn');
-  const authToggleBtn = document.getElementById('auth-toggle-btn');
-  const authToggleText = document.getElementById('auth-toggle-text');
-  const userDisplayEmail = document.getElementById('user-display-email');
+  function subscribeToFirebase(){
+    unsubscribeSnapshot = onSnapshot(doc(db, "ginasio_data", "geral"), (docSnap) => {
+      if(docSnap.exists()){
+        const data = docSnap.data();
+        state = Object.assign({config:defaultConfig,pts:[],alunos:[],grupos:[],ajustes:{},horarios:{}}, data);
+        renderAll();
+      } else {
+        saveStateToFirebase();
+      }
+    });
+  }
 
-  authToggleBtn.addEventListener('click', () => {
-    isLoginMode = !isLoginMode;
-    if(isLoginMode) {
-      authTitle.textContent = 'Entrar';
-      authSubtitle.textContent = 'Introduza as suas credenciais para aceder ao sistema';
-      authSubmitBtn.textContent = 'Entrar';
-      authToggleText.textContent = 'Não tem uma conta?';
-      authToggleBtn.textContent = 'Registar';
-    } else {
-      authTitle.textContent = 'Registar';
-      authSubtitle.textContent = 'Crie uma nova conta para gerir o seu ginásio';
-      authSubmitBtn.textContent = 'Criar Conta';
-      authToggleText.textContent = 'Já tem uma conta?';
-      authToggleBtn.textContent = 'Entrar';
-    }
-  });
-
-  authForm.addEventListener('submit', async (e) => {
+  // --- AUTHENTICATION ---
+  document.getElementById('login-form').addEventListener('submit', async (e)=>{
     e.preventDefault();
-    const email = document.getElementById('auth-email').value;
-    const password = document.getElementById('auth-password').value;
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+    const errorEl = document.getElementById('login-error');
+    errorEl.textContent = '';
 
     try {
-      if(isLoginMode) {
-        await signInWithEmailAndPassword(auth, email, password);
-      } else {
-        await createUserWithEmailAndPassword(auth, email, password);
-      }
-      authForm.reset();
+      await signInWithEmailAndPassword(auth, email, password);
     } catch(err) {
-      showToast('Erro de autenticação: ' + err.message, false);
+      errorEl.textContent = 'Credenciais inválidas. Tenta novamente.';
     }
   });
 
-  document.getElementById('btn-logout').addEventListener('click', () => {
+  document.getElementById('btn-logout').addEventListener('click', ()=>{
     signOut(auth);
   });
 
   onAuthStateChanged(auth, (user) => {
-    currentUser = user;
-    if (user) {
-      userDisplayEmail.textContent = user.email;
-      authContainer.style.display = 'none';
-      appContainer.style.display = 'flex';
-      setupDataListener(user.uid);
+    if(user){
+      document.getElementById('auth-screen').style.display = 'none';
+      document.getElementById('app').classList.add('active');
+      subscribeToFirebase();
     } else {
-      if (unsubscribeSnapshot) unsubscribeSnapshot();
-      authContainer.style.display = 'flex';
-      appContainer.style.display = 'none';
-      state = { config: defaultConfig, pts: [], alunos: [], grupos: [], ajustes: {}, horarios: {} };
+      if(unsubscribeSnapshot) unsubscribeSnapshot();
+      document.getElementById('auth-screen').style.display = 'flex';
+      document.getElementById('app').classList.remove('active');
     }
   });
 
   // ---------- NAV ----------
-  document.querySelectorAll('.nav-btn').forEach(btn=>{
+  document.querySelectorAll('.nav-btn[data-view]').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
       document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
@@ -488,6 +392,7 @@
       });
     });
   }
+
   document.getElementById('btn-save-ginasio').addEventListener('click', async ()=>{
     const el = document.getElementById('ginasio-dias');
     const gymHours = {};
@@ -499,8 +404,8 @@
       } : {open:null,close:null};
     });
     state.config = { sessionDuration: Number(document.getElementById('ginasio-duracao').value)||60, gymHours };
-    const res = await saveDataToFirestore();
-    showToast(res.ok ? 'Horário do ginásio guardado.' : 'Erro ao guardar dados.', res.ok);
+    const res = await saveStateToFirebase();
+    showToast(res.ok ? 'Horário guardado com sucesso' : 'Erro ao guardar', res.ok);
   });
 
   // ---------- BACKUP ----------
@@ -518,10 +423,9 @@
     try{
       const data = JSON.parse(text);
       state = Object.assign({config:defaultConfig,pts:[],alunos:[],grupos:[],ajustes:{},horarios:{}}, data);
-      await migrateGruposToDuo();
-      await saveDataToFirestore();
+      await saveStateToFirebase();
       renderAll();
-      alert('Dados importados com sucesso.');
+      alert('Dados importados e sincronizados com sucesso.');
     }catch(err){ alert('Ficheiro inválido.'); }
   });
 
@@ -550,7 +454,7 @@
       if(!confirm('Remover este PT? Alunos com este PT fixo ficarão sem PT atribuído.')) return;
       state.pts = state.pts.filter(p=>p.id!==b.dataset.delPt);
       state.alunos.forEach(a=>{ if(a.ptFixo===b.dataset.delPt) a.ptFixo='qualquer'; });
-      await saveDataToFirestore();
+      await saveStateToFirebase();
       renderPts();
     }));
   }
@@ -565,8 +469,8 @@
       <label>Horário de trabalho</label>
       <div id="m-dias"></div>
       <div class="modal-actions">
-        <button class="btn secondary" id="m-cancel">Cancelar</button>
-        <button class="btn" id="m-save">Guardar</button>
+        <button class="btn secondary small" id="m-cancel">Cancelar</button>
+        <button class="btn small" id="m-save">Guardar</button>
       </div>`;
     openModal(html, (root)=>{
       const diasEl = root.querySelector('#m-dias');
@@ -601,12 +505,12 @@
           } : {start:null,end:null};
         });
         const temHorario = DIAS.some(d=>workHours[d.key].start);
-        if(!temHorario && !confirm('Este PT não tem nenhum dia de trabalho definido. Sem isso, nunca será possível agendar sessões com ele. Guardar mesmo assim?')) return;
+        if(!temHorario && !confirm('Este PT não tem nenhum dia de trabalho definido. Guardar mesmo assim?')) return;
         pt.nome = nome; pt.capacidade = Math.max(1, Number(root.querySelector('#m-cap').value)||1); pt.workHours = workHours;
         if(!ptId) state.pts.push(pt);
-        const res = await saveDataToFirestore();
+        const res = await saveStateToFirebase();
         closeModal(); renderPts();
-        showToast(res.ok ? 'PT guardado.' : 'Erro ao guardar PT.', res.ok);
+        showToast(res.ok ? 'PT guardado' : 'Erro ao guardar', res.ok);
       });
     });
   }
@@ -643,7 +547,7 @@
         if(parceiro) parceiro.duoParceiroId = null;
       }
       state.alunos = state.alunos.filter(a=>a.id!==b.dataset.delAluno);
-      await saveDataToFirestore();
+      await saveStateToFirebase();
       renderAlunos();
     }));
   }
@@ -698,22 +602,20 @@
         <div class="field"><label>Sessões por semana</label><input type="number" id="m-sessoes" min="1" value="${a.sessoesPorSemana}"></div>
       </div>
       <div class="field"><label style="display:flex;align-items:center;gap:6px;text-transform:none;font-weight:400;color:var(--text);">
-        <input type="checkbox" id="m-grupo" ${a.aceitaGrupo?'checked':''}> Não se importa de partilhar a sessão com outro aluno/dupla (quando o PT permite)
+        <input type="checkbox" id="m-grupo" ${a.aceitaGrupo?'checked':''}> Não se importa de partilhar a sessão
       </label></div>
       <div class="field"><label style="display:flex;align-items:center;gap:6px;text-transform:none;font-weight:400;color:var(--text);">
-        <input type="checkbox" id="m-duo" ${duoOn?'checked':''}> Grupo Duo — treina sempre com outra pessoa específica
+        <input type="checkbox" id="m-duo" ${duoOn?'checked':''}> Grupo Duo — treina sempre com outra pessoa
       </label></div>
       <div class="field" id="m-duo-wrap" style="${duoOn?'':'display:none;'}">
         <label>Com quem</label>
         <select id="m-duo-parceiro">${parceiroOptions}</select>
-        <div class="helptext" style="margin-top:4px;margin-bottom:0;">Ambos passam a ser agendados sempre juntos, na mesma sessão. Se um faltar numa semana, desativa este visto temporariamente para o outro poder ser agendado sozinho ou com outra pessoa.</div>
       </div>
       <label>Disponibilidade semanal</label>
-      <div class="helptext" style="margin-top:-2px;">Indica as janelas de horário em que este aluno pode treinar. <b>Sem pelo menos uma janela, nunca lhe será possível agendar sessões.</b></div>
       <div id="m-avail"></div>
       <div class="modal-actions">
-        <button class="btn secondary" id="m-cancel">Cancelar</button>
-        <button class="btn" id="m-save">Guardar</button>
+        <button class="btn secondary small" id="m-cancel">Cancelar</button>
+        <button class="btn small" id="m-save">Guardar</button>
       </div>`;
     openModal(html, (root)=>{
       renderAvailEditor(root.querySelector('#m-avail'), disponibilidade);
@@ -726,14 +628,14 @@
         if(!nome){ alert('Indica o nome do aluno.'); return; }
         const duoChecked = root.querySelector('#m-duo').checked;
         const novoParceiroId = duoChecked ? root.querySelector('#m-duo-parceiro').value : '';
-        if(duoChecked && !novoParceiroId){ alert('Escolhe com quem este aluno treina em Grupo Duo, ou desativa o visto.'); return; }
-        if(!hasAnyAvailability(disponibilidade) && !confirm('Este aluno não tem nenhuma janela de disponibilidade definida. Sem isso, não será possível agendar nenhuma sessão para ele. Guardar mesmo assim?')) return;
+        if(duoChecked && !novoParceiroId){ alert('Escolhe o parceiro do Duo.'); return; }
+        
         a.nome = nome;
         a.ptFixo = root.querySelector('#m-pt').value;
         a.sessoesPorSemana = Math.max(1, Number(root.querySelector('#m-sessoes').value)||1);
         a.aceitaGrupo = root.querySelector('#m-grupo').checked;
         a.disponibilidade = disponibilidade;
-        
+
         if(a.duoParceiroId && a.duoParceiroId!==novoParceiroId){
           const antigo = state.alunos.find(x=>x.id===a.duoParceiroId);
           if(antigo) antigo.duoParceiroId = null;
@@ -750,14 +652,14 @@
         }
         a.duoParceiroId = novoParceiroId || null;
         if(!alunoId) state.alunos.push(a);
-        const res = await saveDataToFirestore();
+        const res = await saveStateToFirebase();
         closeModal(); renderAlunos();
-        showToast(res.ok ? 'Aluno guardado.' : 'Erro ao guardar aluno.', res.ok);
+        showToast(res.ok ? 'Aluno guardado' : 'Erro ao guardar', res.ok);
       });
     });
   }
 
-  // ---------- UNIDADES DE AGENDAMENTO ----------
+  // ---------- LOGICA DE AGENDAMENTO ----------
   function intersectDisponibilidade(availA, availB){
     const result = {};
     DIAS.forEach(d=>{
@@ -774,12 +676,14 @@
     });
     return result;
   }
+
   function resolveDuoPt(a,b){
     const pa = a.ptFixo && a.ptFixo!=='qualquer' ? a.ptFixo : null;
     const pb = b.ptFixo && b.ptFixo!=='qualquer' ? b.ptFixo : null;
     if(pa && pb) return pa===pb ? pa : 'qualquer';
     return pa || pb || 'qualquer';
   }
+
   function getUnidades(){
     const pareados = new Set();
     const unidades = [];
@@ -791,9 +695,6 @@
       pareados.add(a.id); pareados.add(b.id);
       const sessoes = Math.min(a.sessoesPorSemana||0, b.sessoesPorSemana||0);
       if(sessoes<=0) return;
-      if(a.sessoesPorSemana!==b.sessoesPorSemana){
-        avisos.push(`${a.nome} & ${b.nome}: têm nº de sessões diferentes (${a.sessoesPorSemana}x vs ${b.sessoesPorSemana}x) — só serão agendadas ${sessoes}x em conjunto.`);
-      }
       unidades.push({
         id: 'duo:'+[a.id,b.id].sort().join('__'), tipo:'duo', nome:`${a.nome} & ${b.nome}`, tamanho:2,
         ptFixo: resolveDuoPt(a,b), sessoesPorSemana: sessoes,
@@ -810,6 +711,7 @@
     getUnidades._avisos = avisos;
     return unidades;
   }
+
   function resolveUnidade(id){
     if(typeof id!=='string') return null;
     if(id.startsWith('duo:')){
@@ -823,7 +725,6 @@
     return a?{id:'a:'+a.id,tipo:'aluno',nome:a.nome,tamanho:1,aceitaGrupo:!!a.aceitaGrupo}:null;
   }
 
-  // ---------- HORÁRIO SEMANAL ----------
   function currentWeekId(){
     const inp = document.getElementById('input-semana');
     if(inp.value) return inp.value;
@@ -920,14 +821,14 @@
   }
 
   document.getElementById('btn-gerar').addEventListener('click', async ()=>{
-    if(state.pts.length===0){ alert('Adiciona pelo menos um PT antes de gerar o horário.'); return; }
-    if(state.alunos.length===0){ alert('Adiciona pelo menos um aluno antes de gerar o horário.'); return; }
+    if(state.pts.length===0){ alert('Adiciona pelo menos um PT antes.'); return; }
+    if(state.alunos.length===0){ alert('Adiciona pelo menos um aluno antes.'); return; }
     const weekId = currentWeekId();
-    if(state.horarios[weekId] && !confirm('Já existe um horário para esta semana (incluindo ajustes manuais). Substituir?')) return;
+    if(state.horarios[weekId] && !confirm('Já existe um horário para esta semana. Substituir?')) return;
     state.horarios[weekId] = gerarHorario(weekId);
-    const res = await saveDataToFirestore();
+    const res = await saveStateToFirebase();
     renderHorarioView();
-    showToast(res.ok ? 'Horário gerado e guardado.' : 'Erro ao guardar horário.', res.ok);
+    showToast(res.ok ? 'Horário gerado' : 'Erro ao guardar', res.ok);
   });
 
   document.getElementById('btn-print').addEventListener('click', ()=>window.print());
@@ -940,12 +841,11 @@
       return `<option value="${a.id}">${a.nome}${parceiro?' (duo com '+parceiro.nome+')':''}</option>`;
     }).join('');
     const html = `<h3>Ajustes desta semana</h3>
-      <div class="helptext" style="margin-top:-4px;">Estas alterações aplicam-se só à semana ${weekId} e não mudam a disponibilidade fixa do aluno. Se for parte de um Duo, a disponibilidade do par é sempre o cruzamento dos dois.</div>
       <div class="field"><label>Aluno</label><select id="m-aluno">${options}</select></div>
       <div id="m-avail"></div>
       <div class="modal-actions">
-        <button class="btn secondary" id="m-cancel">Cancelar</button>
-        <button class="btn" id="m-save">Guardar ajuste</button>
+        <button class="btn secondary small" id="m-cancel">Cancelar</button>
+        <button class="btn small" id="m-save">Guardar ajuste</button>
       </div>`;
     openModal(html, (root)=>{
       let alunoSel = state.alunos[0];
@@ -964,9 +864,9 @@
       root.querySelector('#m-save').addEventListener('click', async ()=>{
         state.ajustes[weekId] = state.ajustes[weekId] || {};
         state.ajustes[weekId][alunoSel.id] = disponibilidade;
-        const res = await saveDataToFirestore();
+        const res = await saveStateToFirebase();
         closeModal();
-        showToast(res.ok ? 'Ajuste guardado. Gera novamente o horário desta semana para o aplicar.' : 'Erro ao guardar ajuste.', res.ok);
+        showToast(res.ok ? 'Ajuste guardado' : 'Erro ao guardar', res.ok);
       });
     });
   });
@@ -992,11 +892,7 @@
           data.warnings.map(w=>{
             const u = resolveUnidade(w.unidadeId);
             return `${u?u.nome:'Removido'} — faltam ${w.faltam} sessão(ões)`;
-          }).join('<br>') +
-          `<div style="margin-top:8px;font-size:12px;">Verifica: (1) se tem pelo menos uma janela de disponibilidade; (2) se essa janela coincide com o horário de trabalho de um PT compatível; (3) se a capacidade do PT chega para o par, no caso de Grupo Duo.</div>`;
-      }
-      if(data.notas && data.notas.length>0){
-        html += `<div style="margin-top:${data.warnings.length>0?'10px':'0'};font-size:12px;">${data.notas.join('<br>')}</div>`;
+          }).join('<br>');
       }
       html += `</div>`;
       warnBox.innerHTML = html;
@@ -1095,16 +991,16 @@
         elig.map(u=>`<option value="${u.id}">${u.nome}${u.tipo==='duo'?' (duo, '+u.tamanho+' pessoas)':''}</option>`).join('');
       root.querySelectorAll('[data-remove]').forEach(b=>b.addEventListener('click', async ()=>{
         slot.unidadeIds = slot.unidadeIds.filter(id=>id!==b.dataset.remove);
-        const res = await saveDataToFirestore();
+        const res = await saveStateToFirebase();
         draw(root); renderHorarioView();
-        showToast(res.ok ? 'Sessão atualizada.' : 'Erro ao atualizar sessão.', res.ok);
+        showToast(res.ok ? 'Sessão atualizada' : 'Erro ao guardar', res.ok);
       }));
       root.querySelector('#slot-add').addEventListener('change', async (e)=>{
         if(!e.target.value) return;
         slot.unidadeIds.push(e.target.value);
-        const res = await saveDataToFirestore();
+        const res = await saveStateToFirebase();
         draw(root); renderHorarioView();
-        showToast(res.ok ? 'Sessão atualizada.' : 'Erro ao atualizar sessão.', res.ok);
+        showToast(res.ok ? 'Sessão atualizada' : 'Erro ao guardar', res.ok);
       });
     }
 
@@ -1112,14 +1008,13 @@
       <label>Alunos/grupos nesta sessão (capacidade máx. ${pt.capacidade})</label>
       <div id="slot-current" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;"></div>
       <div class="field"><label>Adicionar</label><select id="slot-add"></select></div>
-      <div class="modal-actions"><button class="btn secondary" id="m-close">Fechar</button></div>`;
+      <div class="modal-actions"><button class="btn secondary small" id="m-close">Fechar</button></div>`;
     openModal(html, (root)=>{
       draw(root);
       root.querySelector('#m-close').addEventListener('click', closeModal);
     });
   }
 
-  // ---------- INIT ----------
   function renderAll(){ renderGinasio(); renderPts(); renderAlunos(); renderHorarioView(); }
 </script>
 </body>
