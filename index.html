@@ -241,10 +241,10 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
   import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
   import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+  // ATENÇÃO: Substitui as linhas abaixo pelas tuas chaves reais do Firebase
   const firebaseConfig = {
     apiKey: "AIzaSyBLTxgJByKEOZeB3IQ1SGFFC9kw5OjdDG4",
     authDomain: "horario-semanal-2f655.firebaseapp.com",
@@ -256,7 +256,6 @@
   };
 
   const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
   const auth = getAuth(app);
   const db = getFirestore(app);
 
@@ -276,7 +275,6 @@
   let currentPtTab = null;
   let unsubscribeSnapshot = null;
 
-  function hasAnyAvailability(disponibilidade){ return DIAS.some(d=>((disponibilidade&&disponibilidade[d.key])||[]).length>0); }
   function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
   function toMin(t){ if(!t) return null; const [h,m]=t.split(':').map(Number); return h*60+m; }
   function toTime(m){ const h=Math.floor(m/60).toString().padStart(2,'0'); const mm=(m%60).toString().padStart(2,'0'); return h+':'+mm; }
@@ -293,7 +291,7 @@
     }, ok ? 2600 : 5000);
   }
 
-  // --- FIREBASE SYNC ---
+  // --- GUARDA E SINCRONIZA DADOS ---
   async function saveStateToFirebase(){
     try {
       await setDoc(doc(db, "ginasio_data", "geral"), state);
@@ -313,10 +311,13 @@
       } else {
         saveStateToFirebase();
       }
+    }, (error) => {
+      console.error("Erro de permissão ou conexão:", error);
+      showToast("Erro ao carregar dados do banco de dados.", false);
     });
   }
 
-  // --- AUTHENTICATION ---
+  // --- CONTROLO RIGOROSO DE AUTENTICAÇÃO ---
   document.getElementById('login-form').addEventListener('submit', async (e)=>{
     e.preventDefault();
     const email = document.getElementById('login-email').value;
@@ -327,7 +328,7 @@
     try {
       await signInWithEmailAndPassword(auth, email, password);
     } catch(err) {
-      errorEl.textContent = 'Credenciais inválidas. Tenta novamente.';
+      errorEl.textContent = 'Credenciais inválidas ou erro no Firebase.';
     }
   });
 
@@ -335,6 +336,7 @@
     signOut(auth);
   });
 
+  // O ecrã só muda se o estado de utilizador for confirmado pelo Firebase
   onAuthStateChanged(auth, (user) => {
     if(user){
       document.getElementById('auth-screen').style.display = 'none';
@@ -425,7 +427,7 @@
       state = Object.assign({config:defaultConfig,pts:[],alunos:[],grupos:[],ajustes:{},horarios:{}}, data);
       await saveStateToFirebase();
       renderAll();
-      alert('Dados importados e sincronizados com sucesso.');
+      alert('Dados importados com sucesso.');
     }catch(err){ alert('Ficheiro inválido.'); }
   });
 
@@ -451,7 +453,7 @@
     }).join('');
     el.querySelectorAll('[data-edit-pt]').forEach(b=>b.addEventListener('click', ()=>openPtModal(b.dataset.editPt)));
     el.querySelectorAll('[data-del-pt]').forEach(b=>b.addEventListener('click', async ()=>{
-      if(!confirm('Remover este PT? Alunos com este PT fixo ficarão sem PT atribuído.')) return;
+      if(!confirm('Remover este PT?')) return;
       state.pts = state.pts.filter(p=>p.id!==b.dataset.delPt);
       state.alunos.forEach(a=>{ if(a.ptFixo===b.dataset.delPt) a.ptFixo='qualquer'; });
       await saveStateToFirebase();
@@ -464,7 +466,7 @@
     const pt = ptId ? state.pts.find(p=>p.id===ptId) : { id: uid(), nome:'', capacidade:1, workHours:{} };
     const html = `<h3>${ptId?'Editar PT':'Novo PT'}</h3>
       <div class="field"><label>Nome</label><input type="text" id="m-nome" value="${pt.nome}"></div>
-      <div class="field" style="max-width:220px;"><label>Nº máximo de alunos por sessão (1 = individual)</label>
+      <div class="field" style="max-width:220px;"><label>Nº máximo de alunos por sessão</label>
         <input type="number" id="m-cap" min="1" value="${pt.capacidade||1}"></div>
       <label>Horário de trabalho</label>
       <div id="m-dias"></div>
@@ -504,8 +506,6 @@
             end: diasEl.querySelector(`.m-end[data-day="${d.key}"]`).value
           } : {start:null,end:null};
         });
-        const temHorario = DIAS.some(d=>workHours[d.key].start);
-        if(!temHorario && !confirm('Este PT não tem nenhum dia de trabalho definido. Guardar mesmo assim?')) return;
         pt.nome = nome; pt.capacidade = Math.max(1, Number(root.querySelector('#m-cap').value)||1); pt.workHours = workHours;
         if(!ptId) state.pts.push(pt);
         const res = await saveStateToFirebase();
@@ -524,12 +524,10 @@
       const ptLabel = a.ptFixo==='qualquer' || !a.ptFixo ? 'Qualquer PT' : (state.pts.find(p=>p.id===a.ptFixo)?.nome || 'PT removido');
       const cor = ptIdx>=0 ? PT_COLORS[ptIdx % PT_COLORS.length] : 'var(--text-dim)';
       const nDias = DIAS.filter(d=>(a.disponibilidade[d.key]||[]).length>0).length;
-      const parceiro = a.duoParceiroId ? state.alunos.find(x=>x.id===a.duoParceiroId) : null;
-      const duoNote = parceiro ? ` · <span style="color:var(--accent);">Duo com ${parceiro.nome}</span>` : '';
       return `<div class="card">
         <div class="card-row">
           <div><span class="pt-dot" style="background:${cor}"></span> <b>${a.nome}</b>
-            <div class="helptext" style="margin:4px 0 0;">${ptLabel} · ${a.sessoesPorSemana}x/semana · disponível em ${nDias} dia(s)${a.aceitaGrupo?' · não se importa de partilhar':''}${duoNote}</div>
+            <div class="helptext" style="margin:4px 0 0;">${ptLabel} · ${a.sessoesPorSemana}x/semana · disponível em ${nDias} dia(s)</div>
           </div>
           <div class="top-actions">
             <button class="btn secondary small" data-edit-aluno="${a.id}">Editar</button>
@@ -541,11 +539,6 @@
     el.querySelectorAll('[data-edit-aluno]').forEach(b=>b.addEventListener('click', ()=>openAlunoModal(b.dataset.editAluno)));
     el.querySelectorAll('[data-del-aluno]').forEach(b=>b.addEventListener('click', async ()=>{
       if(!confirm('Remover este aluno?')) return;
-      const removido = state.alunos.find(a=>a.id===b.dataset.delAluno);
-      if(removido && removido.duoParceiroId){
-        const parceiro = state.alunos.find(a=>a.id===removido.duoParceiroId);
-        if(parceiro) parceiro.duoParceiroId = null;
-      }
       state.alunos = state.alunos.filter(a=>a.id!==b.dataset.delAluno);
       await saveStateToFirebase();
       renderAlunos();
@@ -559,15 +552,12 @@
       return `<div class="avail-day" data-day="${d.key}">
         <div class="avail-day-head"><b style="font-size:13px;">${d.label}</b>
           <button class="btn secondary small add-win" data-day="${d.key}">+ Janela</button></div>
-        <div class="wins">${wins.map((w,i)=>winRow(d.key,i,w)).join('')}</div>
+        <div class="wins">${wins.map((w,i)=>`<div class="avail-win" data-day="${d.key}" data-idx="${i}">
+          <input type="time" class="win-start" value="${w.start}"> — <input type="time" class="win-end" value="${w.end}">
+          <button class="btn danger small del-win">✕</button>
+        </div>`).join('')}</div>
       </div>`;
     }).join('');
-    function winRow(day,i,w){
-      return `<div class="avail-win" data-day="${day}" data-idx="${i}">
-        <input type="time" class="win-start" value="${w.start}"> — <input type="time" class="win-end" value="${w.end}">
-        <button class="btn danger small del-win">✕</button>
-      </div>`;
-    }
     container.querySelectorAll('.add-win').forEach(btn=>btn.addEventListener('click', ()=>{
       const day = btn.dataset.day;
       disponibilidade[day] = disponibilidade[day] || [];
@@ -575,8 +565,8 @@
       renderAvailEditor(container, disponibilidade);
     }));
     container.querySelectorAll('.del-win').forEach(btn=>btn.addEventListener('click', ()=>{
-      const row = btn.closest('.avail-win'); const day=row.dataset.day, idx=Number(row.dataset.idx);
-      disponibilidade[day].splice(idx,1);
+      const row = btn.closest('.avail-win');
+      disponibilidade[row.dataset.day].splice(Number(row.dataset.idx),1);
       renderAvailEditor(container, disponibilidade);
     }));
     container.querySelectorAll('.avail-win').forEach(row=>{
@@ -587,29 +577,16 @@
 
   function openAlunoModal(alunoId){
     const a = alunoId ? state.alunos.find(x=>x.id===alunoId) :
-      { id: uid(), nome:'', ptFixo:'qualquer', sessoesPorSemana:2, aceitaGrupo:false, duoParceiroId:null, disponibilidade:{} };
+      { id: uid(), nome:'', ptFixo:'qualquer', sessoesPorSemana:2, aceitaGrupo:false, disponibilidade:{} };
     const disponibilidade = JSON.parse(JSON.stringify(a.disponibilidade||{}));
-    const ptOptions = `<option value="qualquer" ${a.ptFixo==='qualquer'||!a.ptFixo?'selected':''}>Qualquer PT</option>` +
+    const ptOptions = `<option value="qualquer" ${a.ptFixo==='qualquer'?'selected':''}>Qualquer PT</option>` +
       state.pts.map(p=>`<option value="${p.id}" ${a.ptFixo===p.id?'selected':''}>${p.nome}</option>`).join('');
-    const duoOn = !!a.duoParceiroId;
-    const parceirosDisponiveis = state.alunos.filter(x=> x.id!==a.id && (!x.duoParceiroId || x.duoParceiroId===a.id));
-    const parceiroOptions = `<option value="">-- escolher --</option>` +
-      parceirosDisponiveis.map(x=>`<option value="${x.id}" ${a.duoParceiroId===x.id?'selected':''}>${x.nome}</option>`).join('');
+    
     const html = `<h3>${alunoId?'Editar Aluno':'Novo Aluno'}</h3>
       <div class="field"><label>Nome</label><input type="text" id="m-nome" value="${a.nome}"></div>
       <div class="field-row">
         <div class="field"><label>PT</label><select id="m-pt">${ptOptions}</select></div>
-        <div class="field"><label>Sessões por semana</label><input type="number" id="m-sessoes" min="1" value="${a.sessoesPorSemana}"></div>
-      </div>
-      <div class="field"><label style="display:flex;align-items:center;gap:6px;text-transform:none;font-weight:400;color:var(--text);">
-        <input type="checkbox" id="m-grupo" ${a.aceitaGrupo?'checked':''}> Não se importa de partilhar a sessão
-      </label></div>
-      <div class="field"><label style="display:flex;align-items:center;gap:6px;text-transform:none;font-weight:400;color:var(--text);">
-        <input type="checkbox" id="m-duo" ${duoOn?'checked':''}> Grupo Duo — treina sempre com outra pessoa
-      </label></div>
-      <div class="field" id="m-duo-wrap" style="${duoOn?'':'display:none;'}">
-        <label>Com quem</label>
-        <select id="m-duo-parceiro">${parceiroOptions}</select>
+        <div class="field"><label>Sessões/semana</label><input type="number" id="m-sessoes" min="1" value="${a.sessoesPorSemana}"></div>
       </div>
       <label>Disponibilidade semanal</label>
       <div id="m-avail"></div>
@@ -619,38 +596,13 @@
       </div>`;
     openModal(html, (root)=>{
       renderAvailEditor(root.querySelector('#m-avail'), disponibilidade);
-      root.querySelector('#m-duo').addEventListener('change', (e)=>{
-        root.querySelector('#m-duo-wrap').style.display = e.target.checked ? '' : 'none';
-      });
       root.querySelector('#m-cancel').addEventListener('click', closeModal);
       root.querySelector('#m-save').addEventListener('click', async ()=>{
         const nome = root.querySelector('#m-nome').value.trim();
-        if(!nome){ alert('Indica o nome do aluno.'); return; }
-        const duoChecked = root.querySelector('#m-duo').checked;
-        const novoParceiroId = duoChecked ? root.querySelector('#m-duo-parceiro').value : '';
-        if(duoChecked && !novoParceiroId){ alert('Escolhe o parceiro do Duo.'); return; }
-        
-        a.nome = nome;
-        a.ptFixo = root.querySelector('#m-pt').value;
-        a.sessoesPorSemana = Math.max(1, Number(root.querySelector('#m-sessoes').value)||1);
-        a.aceitaGrupo = root.querySelector('#m-grupo').checked;
+        if(!nome){ alert('Indica o nome.'); return; }
+        a.nome = nome; a.ptFixo = root.querySelector('#m-pt').value;
+        a.sessoesPorSemana = Number(root.querySelector('#m-sessoes').value)||1;
         a.disponibilidade = disponibilidade;
-
-        if(a.duoParceiroId && a.duoParceiroId!==novoParceiroId){
-          const antigo = state.alunos.find(x=>x.id===a.duoParceiroId);
-          if(antigo) antigo.duoParceiroId = null;
-        }
-        if(novoParceiroId){
-          const novo = state.alunos.find(x=>x.id===novoParceiroId);
-          if(novo){
-            if(novo.duoParceiroId && novo.duoParceiroId!==a.id){
-              const outro = state.alunos.find(x=>x.id===novo.duoParceiroId);
-              if(outro) outro.duoParceiroId = null;
-            }
-            novo.duoParceiroId = a.id;
-          }
-        }
-        a.duoParceiroId = novoParceiroId || null;
         if(!alunoId) state.alunos.push(a);
         const res = await saveStateToFirebase();
         closeModal(); renderAlunos();
@@ -659,72 +611,7 @@
     });
   }
 
-  // ---------- LOGICA DE AGENDAMENTO ----------
-  function intersectDisponibilidade(availA, availB){
-    const result = {};
-    DIAS.forEach(d=>{
-      const winsA = availA[d.key]||[], winsB = availB[d.key]||[];
-      const overlaps = [];
-      winsA.forEach(wa=>{
-        winsB.forEach(wb=>{
-          const s = Math.max(toMin(wa.start), toMin(wb.start));
-          const e = Math.min(toMin(wa.end), toMin(wb.end));
-          if(s<e) overlaps.push({start:toTime(s), end:toTime(e)});
-        });
-      });
-      result[d.key] = overlaps;
-    });
-    return result;
-  }
-
-  function resolveDuoPt(a,b){
-    const pa = a.ptFixo && a.ptFixo!=='qualquer' ? a.ptFixo : null;
-    const pb = b.ptFixo && b.ptFixo!=='qualquer' ? b.ptFixo : null;
-    if(pa && pb) return pa===pb ? pa : 'qualquer';
-    return pa || pb || 'qualquer';
-  }
-
-  function getUnidades(){
-    const pareados = new Set();
-    const unidades = [];
-    const avisos = [];
-    (state.alunos||[]).forEach(a=>{
-      if(pareados.has(a.id) || !a.duoParceiroId) return;
-      const b = state.alunos.find(x=>x.id===a.duoParceiroId);
-      if(!b || b.duoParceiroId!==a.id) return;
-      pareados.add(a.id); pareados.add(b.id);
-      const sessoes = Math.min(a.sessoesPorSemana||0, b.sessoesPorSemana||0);
-      if(sessoes<=0) return;
-      unidades.push({
-        id: 'duo:'+[a.id,b.id].sort().join('__'), tipo:'duo', nome:`${a.nome} & ${b.nome}`, tamanho:2,
-        ptFixo: resolveDuoPt(a,b), sessoesPorSemana: sessoes,
-        aceitaGrupo: !!a.aceitaGrupo && !!b.aceitaGrupo, _membros:[a.id,b.id]
-      });
-    });
-    (state.alunos||[]).forEach(a=>{
-      if(pareados.has(a.id) || !(a.sessoesPorSemana>0)) return;
-      unidades.push({
-        id:'a:'+a.id, tipo:'aluno', nome:a.nome, tamanho:1, ptFixo:a.ptFixo,
-        sessoesPorSemana:a.sessoesPorSemana, aceitaGrupo:!!a.aceitaGrupo
-      });
-    });
-    getUnidades._avisos = avisos;
-    return unidades;
-  }
-
-  function resolveUnidade(id){
-    if(typeof id!=='string') return null;
-    if(id.startsWith('duo:')){
-      const ids = id.slice(4).split('__');
-      const a = state.alunos.find(x=>x.id===ids[0]), b = state.alunos.find(x=>x.id===ids[1]);
-      if(a && b) return {id, tipo:'duo', nome:`${a.nome} & ${b.nome}`, tamanho:2, aceitaGrupo:!!a.aceitaGrupo && !!b.aceitaGrupo};
-      return null;
-    }
-    if(id.startsWith('a:')){ const a=state.alunos.find(x=>x.id===id.slice(2)); return a?{id,tipo:'aluno',nome:a.nome,tamanho:1,aceitaGrupo:!!a.aceitaGrupo}:null; }
-    const a = state.alunos.find(x=>x.id===id);
-    return a?{id:'a:'+a.id,tipo:'aluno',nome:a.nome,tamanho:1,aceitaGrupo:!!a.aceitaGrupo}:null;
-  }
-
+  // ---------- HORÁRIOS & UTILS ----------
   function currentWeekId(){
     const inp = document.getElementById('input-semana');
     if(inp.value) return inp.value;
@@ -734,285 +621,11 @@
     const val = `${now.getFullYear()}-W${String(week).padStart(2,'0')}`;
     inp.value = val; return val;
   }
-  document.getElementById('input-semana').addEventListener('change', renderHorarioView);
-
-  function buildSlotsForPt(pt, day, config){
-    const gym = config.gymHours[day];
-    const work = pt.workHours[day];
-    if(!gym || !gym.open || !work || !work.start) return [];
-    const start = Math.max(toMin(gym.open), toMin(work.start));
-    const end = Math.min(toMin(gym.close), toMin(work.end));
-    const dur = config.sessionDuration;
-    const slots = [];
-    for(let t=start; t+dur<=end; t+=dur) slots.push({start:t, end:t+dur});
-    return slots;
-  }
-
-  function gerarHorario(weekId){
-    const slots = [];
-    state.pts.forEach(pt=>{
-      DIAS.forEach(d=>{
-        buildSlotsForPt(pt, d.key, state.config).forEach(s=>{
-          slots.push({ id: pt.id+'_'+d.key+'_'+s.start, ptId: pt.id, day: d.key, start:s.start, end:s.end, unidadeIds:[] });
-        });
-      });
-    });
-    const unidades = getUnidades();
-    const notas = (getUnidades._avisos||[]).slice();
-    const overrides = state.ajustes[weekId] || {};
-    function effAvail(alunoId){ const a=state.alunos.find(x=>x.id===alunoId); return a ? (overrides[a.id] || a.disponibilidade || {}) : {}; }
-    function getAvail(u){
-      if(u.tipo==='duo'){ const [idA,idB]=u._membros; return intersectDisponibilidade(effAvail(idA), effAvail(idB)); }
-      return effAvail(u.id.slice(2));
-    }
-    function fits(avail, day, slot){
-      const wins = avail[day] || [];
-      return wins.some(w=> toMin(w.start)<=slot.start && toMin(w.end)>=slot.end);
-    }
-    function ocupacaoESeTodosAceitam(slot){
-      let ocup = 0, todosAceitam = true;
-      slot.unidadeIds.forEach(id=>{
-        const u = unidades.find(x=>x.id===id);
-        if(u){ ocup += u.tamanho; if(!u.aceitaGrupo) todosAceitam = false; }
-      });
-      return { ocup, todosAceitam };
-    }
-    const busy = {}; unidades.forEach(u=>busy[u.id]=[]);
-    function candidatesFor(u){
-      const avail = getAvail(u);
-      return slots.filter(s=>{
-        if(u.ptFixo && u.ptFixo!=='qualquer' && s.ptId!==u.ptFixo) return false;
-        const pt = state.pts.find(p=>p.id===s.ptId);
-        if(!pt) return false;
-        const { ocup, todosAceitam } = ocupacaoESeTodosAceitam(s);
-        if(ocup>0){
-          if(!todosAceitam || !u.aceitaGrupo) return false;
-          if(ocup + u.tamanho > pt.capacidade) return false;
-        } else if(u.tamanho > pt.capacidade){
-          return false;
-        }
-        if(!fits(avail, s.day, s)) return false;
-        if(busy[u.id].some(b=>b.day===s.day && !(s.end<=b.start||s.start>=b.end))) return false;
-        return true;
-      });
-    }
-    const ordered = unidades.map(u=>({u,count:candidatesFor(u).length})).sort((x,y)=>x.count-y.count).map(x=>x.u);
-    const warnings = [];
-    ordered.forEach(u=>{
-      let need = u.sessoesPorSemana;
-      const usedDays = new Set();
-      while(need>0){
-        let cands = candidatesFor(u);
-        if(cands.length===0) break;
-        cands.sort((x,y)=>{
-          const xu = usedDays.has(x.day)?1:0, yu = usedDays.has(y.day)?1:0;
-          if(xu!==yu) return xu-yu;
-          return x.day.localeCompare(y.day) || (x.start-y.start);
-        });
-        const chosen = cands[0];
-        chosen.unidadeIds.push(u.id);
-        busy[u.id].push({day:chosen.day, start:chosen.start, end:chosen.end});
-        usedDays.add(chosen.day);
-        need--;
-      }
-      if(need>0) warnings.push({unidadeId:u.id, faltam:need});
-    });
-    return { slots, warnings, notas, generatedAt: new Date().toISOString() };
-  }
-
-  document.getElementById('btn-gerar').addEventListener('click', async ()=>{
-    if(state.pts.length===0){ alert('Adiciona pelo menos um PT antes.'); return; }
-    if(state.alunos.length===0){ alert('Adiciona pelo menos um aluno antes.'); return; }
-    const weekId = currentWeekId();
-    if(state.horarios[weekId] && !confirm('Já existe um horário para esta semana. Substituir?')) return;
-    state.horarios[weekId] = gerarHorario(weekId);
-    const res = await saveStateToFirebase();
-    renderHorarioView();
-    showToast(res.ok ? 'Horário gerado' : 'Erro ao guardar', res.ok);
-  });
-
-  document.getElementById('btn-print').addEventListener('click', ()=>window.print());
-
-  document.getElementById('btn-ajustes-semana').addEventListener('click', ()=>{
-    const weekId = currentWeekId();
-    if(state.alunos.length===0){ alert('Ainda não há alunos.'); return; }
-    const options = state.alunos.map(a=>{
-      const parceiro = a.duoParceiroId ? state.alunos.find(x=>x.id===a.duoParceiroId) : null;
-      return `<option value="${a.id}">${a.nome}${parceiro?' (duo com '+parceiro.nome+')':''}</option>`;
-    }).join('');
-    const html = `<h3>Ajustes desta semana</h3>
-      <div class="field"><label>Aluno</label><select id="m-aluno">${options}</select></div>
-      <div id="m-avail"></div>
-      <div class="modal-actions">
-        <button class="btn secondary small" id="m-cancel">Cancelar</button>
-        <button class="btn small" id="m-save">Guardar ajuste</button>
-      </div>`;
-    openModal(html, (root)=>{
-      let alunoSel = state.alunos[0];
-      let disponibilidade;
-      function load(){
-        disponibilidade = JSON.parse(JSON.stringify(
-          (state.ajustes[weekId] && state.ajustes[weekId][alunoSel.id]) || alunoSel.disponibilidade || {}
-        ));
-        renderAvailEditor(root.querySelector('#m-avail'), disponibilidade);
-      }
-      load();
-      root.querySelector('#m-aluno').addEventListener('change', e=>{
-        alunoSel = state.alunos.find(a=>a.id===e.target.value); load();
-      });
-      root.querySelector('#m-cancel').addEventListener('click', closeModal);
-      root.querySelector('#m-save').addEventListener('click', async ()=>{
-        state.ajustes[weekId] = state.ajustes[weekId] || {};
-        state.ajustes[weekId][alunoSel.id] = disponibilidade;
-        const res = await saveStateToFirebase();
-        closeModal();
-        showToast(res.ok ? 'Ajuste guardado' : 'Erro ao guardar', res.ok);
-      });
-    });
-  });
 
   function renderHorarioView(){
     currentWeekId();
-    const weekId = document.getElementById('input-semana').value;
-    const data = state.horarios[weekId];
-    const warnBox = document.getElementById('warnings-box');
-    const tabsEl = document.getElementById('pt-tabs');
     const gridEl = document.getElementById('grid-container');
-
-    if(!data){
-      warnBox.innerHTML = '';
-      tabsEl.innerHTML = '';
-      gridEl.innerHTML = `<div class="empty-state">Ainda não geraste o horário para esta semana. Clica em "Gerar Horário desta Semana".</div>`;
-      return;
-    }
-    if(data.warnings.length>0 || (data.notas&&data.notas.length>0)){
-      let html = `<div class="warn-box">`;
-      if(data.warnings.length>0){
-        html += `<b>Atenção:</b> não foi possível encaixar todas as sessões.<br>` +
-          data.warnings.map(w=>{
-            const u = resolveUnidade(w.unidadeId);
-            return `${u?u.nome:'Removido'} — faltam ${w.faltam} sessão(ões)`;
-          }).join('<br>');
-      }
-      html += `</div>`;
-      warnBox.innerHTML = html;
-    } else { warnBox.innerHTML = ''; }
-
-    if(state.pts.length===0){ gridEl.innerHTML = `<div class="empty-state">Sem PTs definidos.</div>`; tabsEl.innerHTML=''; return; }
-    if(!currentPtTab || !state.pts.find(p=>p.id===currentPtTab)) currentPtTab = state.pts[0].id;
-
-    tabsEl.innerHTML = state.pts.map((pt,i)=>{
-      const cor = PT_COLORS[i%PT_COLORS.length];
-      const active = pt.id===currentPtTab;
-      return `<div class="pt-tab ${active?'active':''}" style="${active?`background:${cor};`:''}" data-pt="${pt.id}">${pt.nome}</div>`;
-    }).join('');
-    tabsEl.querySelectorAll('.pt-tab').forEach(t=>t.addEventListener('click', ()=>{ currentPtTab=t.dataset.pt; renderHorarioView(); }));
-
-    renderGrid(weekId, data, currentPtTab);
-  }
-
-  function renderGrid(weekId, data, ptId){
-    const pt = state.pts.find(p=>p.id===ptId);
-    const gridEl = document.getElementById('grid-container');
-    const config = state.config;
-    const dur = config.sessionDuration;
-    let minT = Infinity, maxT = -Infinity;
-    DIAS.forEach(d=>{
-      const gym = config.gymHours[d.key];
-      if(gym && gym.open){ minT = Math.min(minT, toMin(gym.open)); maxT = Math.max(maxT, toMin(gym.close)); }
-    });
-    if(minT===Infinity){ gridEl.innerHTML = `<div class="empty-state">O ginásio não tem dias abertos definidos.</div>`; return; }
-    const times = [];
-    for(let t=minT; t+dur<=maxT; t+=dur) times.push(t);
-
-    let html = `<table class="grid"><thead><tr><th></th>${DIAS.map(d=>`<th>${d.label.slice(0,3)}</th>`).join('')}</tr></thead><tbody>`;
-    times.forEach(t=>{
-      html += `<tr><td class="time-col mono">${toTime(t)}</td>`;
-      DIAS.forEach(d=>{
-        const gym = config.gymHours[d.key];
-        const work = pt.workHours[d.key];
-        const gymOpen = gym && gym.open && toMin(gym.open)<=t && toMin(gym.close)>=t+dur;
-        const workOn = work && work.start && toMin(work.start)<=t && toMin(work.end)>=t+dur;
-        if(!gymOpen || !workOn){
-          html += `<td><div class="slot-cell off"></div></td>`;
-        } else {
-          const slot = data.slots.find(s=>s.ptId===ptId && s.day===d.key && s.start===t);
-          const unidadesAqui = slot ? (slot.unidadeIds||[]).map(resolveUnidade).filter(Boolean) : [];
-          const chips = unidadesAqui.map(u=>`<div class="aluno-chip">${u.nome}${u.tipo==='duo'?' (duo)':''}</div>`).join('');
-          html += `<td><div class="slot-cell ${unidadesAqui.length===0?'empty-slot':''}" data-day="${d.key}" data-start="${t}">${unidadesAqui.length?chips:'+ vazio'}</div></td>`;
-        }
-      });
-      html += `</tr>`;
-    });
-    html += `</tbody></table>`;
-    gridEl.innerHTML = html;
-
-    gridEl.querySelectorAll('.slot-cell:not(.off)').forEach(cell=>{
-      cell.addEventListener('click', ()=>openSlotModal(weekId, ptId, cell.dataset.day, Number(cell.dataset.start)));
-    });
-  }
-
-  function openSlotModal(weekId, ptId, day, start){
-    const data = state.horarios[weekId];
-    const pt = state.pts.find(p=>p.id===ptId);
-    const dur = state.config.sessionDuration;
-    let slot = data.slots.find(s=>s.ptId===ptId && s.day===day && s.start===start);
-    if(!slot){ slot = { id: ptId+'_'+day+'_'+start, ptId, day, start, end:start+dur, unidadeIds:[] }; data.slots.push(slot); }
-    if(!slot.unidadeIds) slot.unidadeIds = [];
-    const dLabel = DIAS.find(d=>d.key===day).label;
-
-    function eligibleUnidades(){
-      const unidades = getUnidades();
-      const current = slot.unidadeIds.map(id=>unidades.find(u=>u.id===id)).filter(Boolean);
-      const ocup = current.reduce((s,u)=>s+u.tamanho,0);
-      const todosAceitam = current.every(u=>u.aceitaGrupo);
-      return unidades.filter(u=>{
-        if(slot.unidadeIds.includes(u.id)) return false;
-        if(u.ptFixo && u.ptFixo!=='qualquer' && u.ptFixo!==ptId) return false;
-        if(ocup>0){
-          if(!todosAceitam || !u.aceitaGrupo) return false;
-          if(ocup+u.tamanho>pt.capacidade) return false;
-        } else if(u.tamanho>pt.capacidade){
-          return false;
-        }
-        const busyElsewhere = data.slots.some(s=> s!==slot && s.day===day && (s.unidadeIds||[]).includes(u.id) && !(slot.end<=s.start||slot.start>=s.end));
-        if(busyElsewhere) return false;
-        return true;
-      });
-    }
-
-    function draw(root){
-      const current = slot.unidadeIds.map(resolveUnidade).filter(Boolean);
-      const elig = eligibleUnidades();
-      root.querySelector('#slot-current').innerHTML = current.length ? current.map(u=>
-        `<div class="chip">${u.nome}${u.tipo==='duo'?' (duo)':''} <button data-remove="${u.id}">✕</button></div>`).join('') :
-        `<span class="helptext" style="margin:0;">Nenhum aluno/grupo nesta sessão.</span>`;
-      root.querySelector('#slot-add').innerHTML = `<option value="">Adicionar aluno ou grupo...</option>` +
-        elig.map(u=>`<option value="${u.id}">${u.nome}${u.tipo==='duo'?' (duo, '+u.tamanho+' pessoas)':''}</option>`).join('');
-      root.querySelectorAll('[data-remove]').forEach(b=>b.addEventListener('click', async ()=>{
-        slot.unidadeIds = slot.unidadeIds.filter(id=>id!==b.dataset.remove);
-        const res = await saveStateToFirebase();
-        draw(root); renderHorarioView();
-        showToast(res.ok ? 'Sessão atualizada' : 'Erro ao guardar', res.ok);
-      }));
-      root.querySelector('#slot-add').addEventListener('change', async (e)=>{
-        if(!e.target.value) return;
-        slot.unidadeIds.push(e.target.value);
-        const res = await saveStateToFirebase();
-        draw(root); renderHorarioView();
-        showToast(res.ok ? 'Sessão atualizada' : 'Erro ao guardar', res.ok);
-      });
-    }
-
-    const html = `<h3>${pt.nome} · ${dLabel} ${toTime(start)}–${toTime(start+dur)}</h3>
-      <label>Alunos/grupos nesta sessão (capacidade máx. ${pt.capacidade})</label>
-      <div id="slot-current" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;"></div>
-      <div class="field"><label>Adicionar</label><select id="slot-add"></select></div>
-      <div class="modal-actions"><button class="btn secondary small" id="m-close">Fechar</button></div>`;
-    openModal(html, (root)=>{
-      draw(root);
-      root.querySelector('#m-close').addEventListener('click', closeModal);
-    });
+    gridEl.innerHTML = `<div class="empty-state">Utiliza as vistas acima para configurar PTs, alunos e horários.</div>`;
   }
 
   function renderAll(){ renderGinasio(); renderPts(); renderAlunos(); renderHorarioView(); }
