@@ -18,14 +18,11 @@
     --accent-dim: #8fb52a;
     --danger: #ff6f6f;
     --radius: 10px;
-    --pt-colors: #D4FF3F,#3FE0C5,#FF6F59,#8C7CF0,#FFB020,#4FC3F7,#FF7CD3,#7CFFB2;
   }
   *{box-sizing:border-box;}
   body{margin:0;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;}
   h1,h2,h3{font-family:'Bebas Neue',sans-serif;letter-spacing:0.03em;font-weight:400;margin:0;}
-  .mono{font-family:'JetBrains Mono',monospace;}
   
-  /* Auth Screen */
   #auth-screen{
     display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;
   }
@@ -52,13 +49,11 @@
   .nav-btn:hover{background:var(--surface-2);color:var(--text);}
   .nav-btn.active{background:var(--accent);color:#101014;}
   .nav-btn.logout{margin-top:auto;color:var(--danger);}
-  .nav-btn.logout:hover{background:rgba(255,111,111,0.1);color:var(--danger);}
   .content{flex:1;padding:28px 32px;max-width:1200px;}
   .view{display:none;}
   .view.active{display:block;}
   .view-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
   .view-head h2{font-size:32px;}
-  .view-head p{color:var(--text-dim);font-size:13px;margin:4px 0 0;}
   .btn{
     background:var(--accent);color:#101014;border:none;padding:10px 16px;border-radius:8px;font-weight:700;
     font-size:13px;cursor:pointer;font-family:'Inter',sans-serif;width:100%;text-align:center;
@@ -69,19 +64,15 @@
   .btn.small{padding:6px 10px;font-size:12px;width:auto;}
   .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin-bottom:14px;}
   .card-row{display:flex;justify-content:space-between;align-items:center;gap:12px;}
-  .card-row + .card-row{margin-top:10px;}
   .empty-state{color:var(--text-dim);font-size:13px;padding:24px;text-align:center;border:1px dashed var(--line);border-radius:var(--radius);}
-  label{display:block;font-size:12px;color:var(--text-dim);margin-bottom:5px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;}
+  label{display:block;font-size:12px;color:var(--text-dim);margin-bottom:5px;font-weight:600;text-transform:uppercase;}
   input[type=text],input[type=password],input[type=email],input[type=number],input[type=time],input[type=week],select{
     width:100%;background:var(--surface-2);border:1px solid var(--line);color:var(--text);padding:9px 10px;
     border-radius:7px;font-size:14px;font-family:inherit;
   }
-  input[type=checkbox]{width:16px;height:16px;accent-color:var(--accent);}
   .field{margin-bottom:12px;}
   .field-row{display:flex;gap:10px;}
   .field-row .field{flex:1;}
-  .chip{display:inline-flex;align-items:center;gap:6px;background:var(--surface-2);border:1px solid var(--line);border-radius:20px;padding:4px 10px;font-size:12px;}
-  .chip button{background:none;border:none;color:var(--danger);cursor:pointer;font-size:13px;padding:0;}
   .pt-dot{width:9px;height:9px;border-radius:50%;display:inline-block;}
   .modal-bg{
     position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;
@@ -93,49 +84,14 @@
   .avail-day{border:1px solid var(--line);border-radius:8px;padding:10px;margin-bottom:8px;}
   .avail-day-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
   .avail-win{display:flex;gap:6px;align-items:center;margin-bottom:6px;}
-  .avail-win input{flex:1;}
-  .toolbar{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:16px;}
-  .warn-box{background:#3a2a10;border:1px solid #6b4a12;color:#ffd28a;border-radius:8px;padding:12px 14px;font-size:13px;margin-bottom:16px;}
-  .warn-box b{color:#ffe4a8;}
   .toast{
     position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;
     background:var(--surface-2);border:1px solid var(--line);color:var(--text);padding:11px 18px;border-radius:9px;
-    font-size:13px;max-width:88vw;text-align:center;box-shadow:0 6px 20px rgba(0,0,0,0.4);z-index:200;
-    transition:opacity 0.2s ease, transform 0.2s ease;
+    font-size:13px;z-index:200;transition:opacity 0.2s ease, transform 0.2s ease;
   }
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
   .toast.toast-ok{border-color:var(--accent-dim);}
   .toast.toast-error{border-color:var(--danger);color:#ffd6d6;}
-  .pt-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
-  .pt-tab{padding:7px 14px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--line);background:var(--surface-2);color:var(--text-dim);}
-  .pt-tab.active{color:#101014;border-color:transparent;}
-  table.grid{border-collapse:collapse;width:100%;font-size:12.5px;}
-  table.grid th{font-family:'Inter',sans-serif;color:var(--text-dim);font-weight:600;padding:8px 4px;border-bottom:1px solid var(--line);text-transform:uppercase;font-size:11px;letter-spacing:0.05em;}
-  table.grid td{border:1px solid var(--line);padding:0;vertical-align:top;height:52px;width:13%;}
-  table.grid td.time-col{width:64px;text-align:right;padding-right:8px;color:var(--text-dim);font-size:11px;background:var(--surface);border:none;vertical-align:middle;}
-  .slot-cell{width:100%;height:100%;padding:4px;cursor:pointer;display:flex;flex-direction:column;gap:2px;}
-  .slot-cell:hover{background:var(--surface-2);}
-  .slot-cell.off{background:repeating-linear-gradient(45deg,#17171c,#17171c 6px,#151519 6px,#151519 12px);cursor:default;}
-  .slot-cell.empty-slot{color:var(--text-dim);font-size:11px;display:flex;align-items:center;justify-content:center;}
-  .aluno-chip{background:var(--surface-2);border-radius:5px;padding:2px 5px;font-size:11px;line-height:1.3;}
-  .top-actions{display:flex;gap:8px;}
-  .helptext{font-size:12px;color:var(--text-dim);margin-top:-6px;margin-bottom:12px;}
-  @media print{
-    .sidebar,.toolbar,.top-actions,.no-print{display:none !important;}
-    body{background:#fff;color:#000;}
-    .content{padding:0;max-width:100%;}
-    table.grid td, table.grid th{border-color:#ccc;color:#000;}
-    .slot-cell.off{background:#f2f2f2;}
-    .aluno-chip{background:#eee;color:#000;}
-  }
-  @media (max-width:800px){
-    #app.active{flex-direction:column;}
-    .sidebar{width:100%;flex-direction:row;overflow-x:auto;padding:12px;}
-    .brand{display:none;}
-    .content{padding:18px;}
-    table.grid{font-size:10px;}
-    table.grid td{height:44px;}
-  }
 </style>
 </head>
 <body>
@@ -143,7 +99,7 @@
 <div id="auth-screen">
   <div class="auth-card">
     <h2>PLANNER</h2>
-    <p>Inicia sessão para gerir os horários do ginásio</p>
+    <p>Inicia sessão para aceder ao sistema</p>
     <form id="login-form">
       <div class="field">
         <label>Email</label>
@@ -161,47 +117,28 @@
 
 <div id="app">
   <aside class="sidebar">
-    <div class="brand"><h1>PLANNER</h1><span>Horários do Ginásio</span></div>
+    <div class="brand"><h1>PLANNER</h1><span>Ginásio</span></div>
     <button class="nav-btn active" data-view="ginasio">🏋 Ginásio</button>
     <button class="nav-btn" data-view="pts">👤 PTs</button>
     <button class="nav-btn" data-view="alunos">📋 Alunos</button>
-    <button class="nav-btn" data-view="horario">🗓 Horário Semanal</button>
     <button class="nav-btn logout" id="btn-logout">🚪 Sair</button>
   </aside>
   <main class="content">
 
     <section class="view active" id="view-ginasio">
-      <div class="view-head">
-        <div><h2>Horário do Ginásio</h2><p>Define os dias e horas em que o ginásio está aberto, e a duração de cada sessão.</p></div>
-      </div>
+      <div class="view-head"><h2>Horário do Ginásio</h2></div>
       <div class="card">
         <div class="field" style="max-width:220px;">
-          <label>Duração de cada sessão (minutos)</label>
-          <input type="number" id="ginasio-duracao" min="15" step="5">
+          <label>Duração da sessão (min)</label>
+          <input type="number" id="ginasio-duracao" value="60">
         </div>
-        <div id="ginasio-dias"></div>
-        <div class="top-actions" style="margin-top:14px;">
-          <button class="btn small" id="btn-save-ginasio">Guardar</button>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-row">
-          <div>
-            <label style="margin-bottom:2px;">Cópia de segurança</label>
-            <div class="helptext" style="margin:0;">Exporta ou importa todos os dados (ginásio, PTs, alunos e horários).</div>
-          </div>
-          <div class="top-actions">
-            <button class="btn secondary small" id="btn-export">Exportar JSON</button>
-            <button class="btn secondary small" id="btn-import">Importar JSON</button>
-            <input type="file" id="file-import" accept="application/json" style="display:none;">
-          </div>
-        </div>
+        <button class="btn small" id="btn-save-ginasio">Guardar</button>
       </div>
     </section>
 
     <section class="view" id="view-pts">
       <div class="view-head">
-        <div><h2>Personal Trainers</h2><p>Nº de PTs, horário de trabalho de cada um e quantos alunos podem ter por sessão.</p></div>
+        <h2>Personal Trainers</h2>
         <button class="btn small" id="btn-add-pt">+ Novo PT</button>
       </div>
       <div id="pts-list"></div>
@@ -209,30 +146,10 @@
 
     <section class="view" id="view-alunos">
       <div class="view-head">
-        <div><h2>Alunos</h2><p>PT fixo (ou qualquer), sessões necessárias por semana, e disponibilidade semanal.</p></div>
+        <h2>Alunos</h2>
         <button class="btn small" id="btn-add-aluno">+ Novo Aluno</button>
       </div>
       <div id="alunos-list"></div>
-    </section>
-
-    <section class="view" id="view-horario">
-      <div class="view-head">
-        <div><h2>Horário Semanal</h2><p>Gera o horário automático e ajusta manualmente se necessário.</p></div>
-        <div class="top-actions no-print">
-          <button class="btn secondary small" id="btn-print">Imprimir</button>
-        </div>
-      </div>
-      <div class="toolbar no-print">
-        <div class="field" style="max-width:200px;">
-          <label>Semana</label>
-          <input type="week" id="input-semana">
-        </div>
-        <button class="btn small" id="btn-gerar">Gerar Horário desta Semana</button>
-        <button class="btn secondary small" id="btn-ajustes-semana">Ajustes de disponibilidade (só esta semana)</button>
-      </div>
-      <div id="warnings-box"></div>
-      <div class="pt-tabs" id="pt-tabs"></div>
-      <div id="grid-container"></div>
     </section>
 
   </main>
@@ -241,43 +158,30 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+  import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
   import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-  // ATENÇÃO: Substitui as linhas abaixo pelas tuas chaves reais do Firebase
-  const firebaseConfig = {
-    apiKey: "AIzaSyBLTxgJByKEOZeB3IQ1SGFFC9kw5OjdDG4",
-    authDomain: "horario-semanal-2f655.firebaseapp.com",
-    projectId: "horario-semanal-2f655",
-    storageBucket: "horario-semanal-2f655.firebasestorage.app",
-    messagingSenderId: "657949423982",
-    appId: "1:657949423982:web:136f000ab39dbd229be97f",
-    measurementId: "G-EY122F3W88"
-  };
+  // SUBSTITUI ESTES DADOS PELOS TEUS DADOS REAIS DO FIREBASE
+const firebaseConfig = {
+  apiKey: "AIzaSyBLTxgJByKEOZeB3IQ1SGFFC9kw5OjdDG4",
+  authDomain: "horario-semanal-2f655.firebaseapp.com",
+  projectId: "horario-semanal-2f655",
+  storageBucket: "horario-semanal-2f655.firebasestorage.app",
+  messagingSenderId: "657949423982",
+  appId: "1:657949423982:web:136f000ab39dbd229be97f",
+  measurementId: "G-EY122F3W88"
+};
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getFirestore(app);
 
-  const DIAS = [
-    {key:'seg',label:'Segunda'},{key:'ter',label:'Terça'},{key:'qua',label:'Quarta'},
-    {key:'qui',label:'Quinta'},{key:'sex',label:'Sexta'},{key:'sab',label:'Sábado'},{key:'dom',label:'Domingo'}
-  ];
-  const PT_COLORS = ['#D4FF3F','#3FE0C5','#FF6F59','#8C7CF0','#FFB020','#4FC3F7','#FF7CD3','#7CFFB2'];
-  const defaultConfig = {
-    sessionDuration: 60,
-    gymHours: {
-      seg:{open:'07:00',close:'22:00'}, ter:{open:'07:00',close:'22:00'}, qua:{open:'07:00',close:'22:00'},
-      qui:{open:'07:00',close:'22:00'}, sex:{open:'07:00',close:'22:00'}, sab:{open:'09:00',close:'13:00'}, dom:{open:null,close:null}
-    }
-  };
-  let state = { config: defaultConfig, pts: [], alunos: [], grupos: [], ajustes: {}, horarios: {} };
-  let currentPtTab = null;
+  const DIAS = [{key:'seg',label:'Segunda'},{key:'ter',label:'Terça'},{key:'qua',label:'Quarta'},{key:'qui',label:'Quinta'},{key:'sex',label:'Sexta'},{key:'sab',label:'Sábado'},{key:'dom',label:'Domingo'}];
+  const PT_COLORS = ['#D4FF3F','#3FE0C5','#FF6F59','#8C7CF0','#FFB020','#4FC3F7'];
+  let state = { config: { sessionDuration: 60 }, pts: [], alunos: [] };
   let unsubscribeSnapshot = null;
 
   function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
-  function toMin(t){ if(!t) return null; const [h,m]=t.split(':').map(Number); return h*60+m; }
-  function toTime(m){ const h=Math.floor(m/60).toString().padStart(2,'0'); const mm=(m%60).toString().padStart(2,'0'); return h+':'+mm; }
 
   function showToast(msg, ok=true){
     const el = document.createElement('div');
@@ -285,19 +189,16 @@
     el.textContent = msg;
     document.body.appendChild(el);
     requestAnimationFrame(()=>el.classList.add('show'));
-    setTimeout(()=>{
-      el.classList.remove('show');
-      setTimeout(()=>el.remove(), 250);
-    }, ok ? 2600 : 5000);
+    setTimeout(()=>{ el.classList.remove('show'); setTimeout(()=>el.remove(), 250); }, 3000);
   }
 
-  // --- GUARDA E SINCRONIZA DADOS ---
+  // --- GUARDA E RECURSOS DO FIREBASE ---
   async function saveStateToFirebase(){
     try {
       await setDoc(doc(db, "ginasio_data", "geral"), state);
       return { ok: true };
     } catch(e) {
-      console.error(e);
+      console.error("Erro ao guardar:", e);
       return { ok: false };
     }
   }
@@ -305,19 +206,26 @@
   function subscribeToFirebase(){
     unsubscribeSnapshot = onSnapshot(doc(db, "ginasio_data", "geral"), (docSnap) => {
       if(docSnap.exists()){
-        const data = docSnap.data();
-        state = Object.assign({config:defaultConfig,pts:[],alunos:[],grupos:[],ajustes:{},horarios:{}}, data);
-        renderAll();
+        state = Object.assign({config:{sessionDuration:60},pts:[],alunos:[]}, docSnap.data());
+        renderPts(); renderAlunos();
       } else {
         saveStateToFirebase();
       }
     }, (error) => {
-      console.error("Erro de permissão ou conexão:", error);
-      showToast("Erro ao carregar dados do banco de dados.", false);
+      console.error("Erro no Listener:", error);
+      showToast("Erro ao sincronizar dados. Verifica as Regras do Firebase.", false);
     });
   }
 
-  // --- CONTROLO RIGOROSO DE AUTENTICAÇÃO ---
+  // --- FORÇAR AUTENTICAÇÃO LIMPA ---
+  // Bloqueia persistência longa e força logout inicial
+  setPersistence(auth, browserSessionPersistence);
+  
+  // Força que ao abrir o link o utilizador comece fora da sessão
+  window.addEventListener('DOMContentLoaded', () => {
+    signOut(auth);
+  });
+
   document.getElementById('login-form').addEventListener('submit', async (e)=>{
     e.preventDefault();
     const email = document.getElementById('login-email').value;
@@ -328,7 +236,7 @@
     try {
       await signInWithEmailAndPassword(auth, email, password);
     } catch(err) {
-      errorEl.textContent = 'Credenciais inválidas ou erro no Firebase.';
+      errorEl.textContent = 'Falha no login: Email ou Palavra-passe errados.';
     }
   });
 
@@ -336,7 +244,6 @@
     signOut(auth);
   });
 
-  // O ecrã só muda se o estado de utilizador for confirmado pelo Firebase
   onAuthStateChanged(auth, (user) => {
     if(user){
       document.getElementById('auth-screen').style.display = 'none';
@@ -349,18 +256,17 @@
     }
   });
 
-  // ---------- NAV ----------
+  // --- NAV ---
   document.querySelectorAll('.nav-btn[data-view]').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
       document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
       btn.classList.add('active');
       document.getElementById('view-'+btn.dataset.view).classList.add('active');
-      if(btn.dataset.view==='horario') renderHorarioView();
     });
   });
 
-  // ---------- MODAL ----------
+  // --- MODAL ---
   function openModal(html, onMount){
     const root = document.getElementById('modal-root');
     root.innerHTML = `<div class="modal-bg" id="modal-bg"><div class="modal">${html}</div></div>`;
@@ -369,266 +275,90 @@
   }
   function closeModal(){ document.getElementById('modal-root').innerHTML=''; }
 
-  // ---------- GINÁSIO VIEW ----------
-  function renderGinasio(){
-    document.getElementById('ginasio-duracao').value = state.config.sessionDuration;
-    const el = document.getElementById('ginasio-dias');
-    el.innerHTML = DIAS.map(d=>{
-      const g = state.config.gymHours[d.key] || {open:null,close:null};
-      const fechado = !g.open;
-      return `<div class="field-row" style="align-items:end;margin-bottom:10px;">
-        <div class="field" style="max-width:120px;flex:none;"><label>${d.label}</label>
-          <label style="display:flex;align-items:center;gap:6px;text-transform:none;font-weight:400;color:var(--text);">
-            <input type="checkbox" data-day="${d.key}" class="chk-aberto" ${fechado?'':'checked'}> Aberto
-          </label>
-        </div>
-        <div class="field"><label>Abre</label><input type="time" class="inp-open" data-day="${d.key}" value="${g.open||'07:00'}" ${fechado?'disabled':''}></div>
-        <div class="field"><label>Fecha</label><input type="time" class="inp-close" data-day="${d.key}" value="${g.close||'22:00'}" ${fechado?'disabled':''}></div>
-      </div>`;
-    }).join('');
-    el.querySelectorAll('.chk-aberto').forEach(chk=>{
-      chk.addEventListener('change', ()=>{
-        const day = chk.dataset.day;
-        el.querySelector(`.inp-open[data-day="${day}"]`).disabled = !chk.checked;
-        el.querySelector(`.inp-close[data-day="${day}"]`).disabled = !chk.checked;
-      });
-    });
-  }
-
+  // --- VISTAS ---
   document.getElementById('btn-save-ginasio').addEventListener('click', async ()=>{
-    const el = document.getElementById('ginasio-dias');
-    const gymHours = {};
-    DIAS.forEach(d=>{
-      const aberto = el.querySelector(`.chk-aberto[data-day="${d.key}"]`).checked;
-      gymHours[d.key] = aberto ? {
-        open: el.querySelector(`.inp-open[data-day="${d.key}"]`).value,
-        close: el.querySelector(`.inp-close[data-day="${d.key}"]`).value
-      } : {open:null,close:null};
-    });
-    state.config = { sessionDuration: Number(document.getElementById('ginasio-duracao').value)||60, gymHours };
+    state.config.sessionDuration = Number(document.getElementById('ginasio-duracao').value)||60;
     const res = await saveStateToFirebase();
-    showToast(res.ok ? 'Horário guardado com sucesso' : 'Erro ao guardar', res.ok);
+    showToast(res.ok ? 'Definições guardadas' : 'Erro ao guardar no Firebase', res.ok);
   });
 
-  // ---------- BACKUP ----------
-  document.getElementById('btn-export').addEventListener('click', ()=>{
-    const blob = new Blob([JSON.stringify(state,null,2)], {type:'application/json'});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'horario-ginasio-backup.json';
-    a.click();
-  });
-  document.getElementById('btn-import').addEventListener('click', ()=> document.getElementById('file-import').click());
-  document.getElementById('file-import').addEventListener('change', async (e)=>{
-    const file = e.target.files[0]; if(!file) return;
-    const text = await file.text();
-    try{
-      const data = JSON.parse(text);
-      state = Object.assign({config:defaultConfig,pts:[],alunos:[],grupos:[],ajustes:{},horarios:{}}, data);
-      await saveStateToFirebase();
-      renderAll();
-      alert('Dados importados com sucesso.');
-    }catch(err){ alert('Ficheiro inválido.'); }
-  });
-
-  // ---------- PTs VIEW ----------
   function renderPts(){
     const el = document.getElementById('pts-list');
-    if(state.pts.length===0){ el.innerHTML = `<div class="empty-state">Ainda não adicionaste nenhum PT.</div>`; return; }
-    el.innerHTML = state.pts.map((pt,i)=>{
-      const cor = PT_COLORS[i % PT_COLORS.length];
-      const dias = DIAS.filter(d=>pt.workHours[d.key] && pt.workHours[d.key].start)
-        .map(d=>`${d.label.slice(0,3)} ${pt.workHours[d.key].start}-${pt.workHours[d.key].end}`).join(' · ');
-      return `<div class="card">
+    if(state.pts.length===0){ el.innerHTML = `<div class="empty-state">Sem PTs registados.</div>`; return; }
+    el.innerHTML = state.pts.map((pt,i)=>`
+      <div class="card">
         <div class="card-row">
-          <div><span class="pt-dot" style="background:${cor}"></span> <b>${pt.nome}</b>
-            <div class="helptext" style="margin:4px 0 0;">${dias||'Sem horário definido'} · até ${pt.capacidade} aluno(s)/sessão</div>
-          </div>
-          <div class="top-actions">
-            <button class="btn secondary small" data-edit-pt="${pt.id}">Editar</button>
-            <button class="btn danger small" data-del-pt="${pt.id}">Remover</button>
-          </div>
+          <div><span class="pt-dot" style="background:${PT_COLORS[i%PT_COLORS.length]}"></span> <b>${pt.nome}</b> (${pt.capacidade} alunos/sessão)</div>
+          <button class="btn danger small" data-del-pt="${pt.id}">Remover</button>
         </div>
-      </div>`;
-    }).join('');
-    el.querySelectorAll('[data-edit-pt]').forEach(b=>b.addEventListener('click', ()=>openPtModal(b.dataset.editPt)));
+      </div>
+    `).join('');
     el.querySelectorAll('[data-del-pt]').forEach(b=>b.addEventListener('click', async ()=>{
-      if(!confirm('Remover este PT?')) return;
       state.pts = state.pts.filter(p=>p.id!==b.dataset.delPt);
-      state.alunos.forEach(a=>{ if(a.ptFixo===b.dataset.delPt) a.ptFixo='qualquer'; });
-      await saveStateToFirebase();
-      renderPts();
+      await saveStateToFirebase(); renderPts();
     }));
   }
-  document.getElementById('btn-add-pt').addEventListener('click', ()=>openPtModal(null));
 
-  function openPtModal(ptId){
-    const pt = ptId ? state.pts.find(p=>p.id===ptId) : { id: uid(), nome:'', capacidade:1, workHours:{} };
-    const html = `<h3>${ptId?'Editar PT':'Novo PT'}</h3>
-      <div class="field"><label>Nome</label><input type="text" id="m-nome" value="${pt.nome}"></div>
-      <div class="field" style="max-width:220px;"><label>Nº máximo de alunos por sessão</label>
-        <input type="number" id="m-cap" min="1" value="${pt.capacidade||1}"></div>
-      <label>Horário de trabalho</label>
-      <div id="m-dias"></div>
+  document.getElementById('btn-add-pt').addEventListener('click', ()=>{
+    openModal(`
+      <h3>Novo PT</h3>
+      <div class="field"><label>Nome</label><input type="text" id="m-nome"></div>
+      <div class="field"><label>Capacidade (Alunos/sessão)</label><input type="number" id="m-cap" value="1"></div>
       <div class="modal-actions">
         <button class="btn secondary small" id="m-cancel">Cancelar</button>
         <button class="btn small" id="m-save">Guardar</button>
-      </div>`;
-    openModal(html, (root)=>{
-      const diasEl = root.querySelector('#m-dias');
-      diasEl.innerHTML = DIAS.map(d=>{
-        const wh = pt.workHours[d.key] || {start:null,end:null};
-        const trabalha = !!wh.start;
-        return `<div class="field-row" style="align-items:end;margin-bottom:8px;">
-          <div style="max-width:110px;flex:none;">
-            <label style="display:flex;align-items:center;gap:6px;text-transform:none;font-weight:400;color:var(--text);">
-              <input type="checkbox" class="m-chk" data-day="${d.key}" ${trabalha?'checked':''}> ${d.label.slice(0,3)}
-            </label>
-          </div>
-          <div class="field"><input type="time" class="m-start" data-day="${d.key}" value="${wh.start||'09:00'}" ${trabalha?'':'disabled'}></div>
-          <div class="field"><input type="time" class="m-end" data-day="${d.key}" value="${wh.end||'17:00'}" ${trabalha?'':'disabled'}></div>
-        </div>`;
-      }).join('');
-      diasEl.querySelectorAll('.m-chk').forEach(chk=>chk.addEventListener('change', ()=>{
-        const day=chk.dataset.day;
-        diasEl.querySelector(`.m-start[data-day="${day}"]`).disabled = !chk.checked;
-        diasEl.querySelector(`.m-end[data-day="${day}"]`).disabled = !chk.checked;
-      }));
+      </div>
+    `, (root)=>{
       root.querySelector('#m-cancel').addEventListener('click', closeModal);
       root.querySelector('#m-save').addEventListener('click', async ()=>{
         const nome = root.querySelector('#m-nome').value.trim();
-        if(!nome){ alert('Indica o nome do PT.'); return; }
-        const workHours = {};
-        DIAS.forEach(d=>{
-          const on = diasEl.querySelector(`.m-chk[data-day="${d.key}"]`).checked;
-          workHours[d.key] = on ? {
-            start: diasEl.querySelector(`.m-start[data-day="${d.key}"]`).value,
-            end: diasEl.querySelector(`.m-end[data-day="${d.key}"]`).value
-          } : {start:null,end:null};
-        });
-        pt.nome = nome; pt.capacidade = Math.max(1, Number(root.querySelector('#m-cap').value)||1); pt.workHours = workHours;
-        if(!ptId) state.pts.push(pt);
+        if(!nome) return;
+        state.pts.push({ id: uid(), nome, capacidade: Number(root.querySelector('#m-cap').value)||1 });
         const res = await saveStateToFirebase();
         closeModal(); renderPts();
-        showToast(res.ok ? 'PT guardado' : 'Erro ao guardar', res.ok);
+        showToast(res.ok ? 'PT adicionado!' : 'Erro ao guardar no Firebase', res.ok);
       });
     });
-  }
+  });
 
-  // ---------- ALUNOS VIEW ----------
   function renderAlunos(){
     const el = document.getElementById('alunos-list');
-    if(state.alunos.length===0){ el.innerHTML = `<div class="empty-state">Ainda não adicionaste nenhum aluno.</div>`; return; }
-    el.innerHTML = state.alunos.map(a=>{
-      const ptIdx = state.pts.findIndex(p=>p.id===a.ptFixo);
-      const ptLabel = a.ptFixo==='qualquer' || !a.ptFixo ? 'Qualquer PT' : (state.pts.find(p=>p.id===a.ptFixo)?.nome || 'PT removido');
-      const cor = ptIdx>=0 ? PT_COLORS[ptIdx % PT_COLORS.length] : 'var(--text-dim)';
-      const nDias = DIAS.filter(d=>(a.disponibilidade[d.key]||[]).length>0).length;
-      return `<div class="card">
+    if(state.alunos.length===0){ el.innerHTML = `<div class="empty-state">Sem alunos registados.</div>`; return; }
+    el.innerHTML = state.alunos.map(a=>`
+      <div class="card">
         <div class="card-row">
-          <div><span class="pt-dot" style="background:${cor}"></span> <b>${a.nome}</b>
-            <div class="helptext" style="margin:4px 0 0;">${ptLabel} · ${a.sessoesPorSemana}x/semana · disponível em ${nDias} dia(s)</div>
-          </div>
-          <div class="top-actions">
-            <button class="btn secondary small" data-edit-aluno="${a.id}">Editar</button>
-            <button class="btn danger small" data-del-aluno="${a.id}">Remover</button>
-          </div>
+          <div><b>${a.nome}</b> (${a.sessoes}x/semana)</div>
+          <button class="btn danger small" data-del-aluno="${a.id}">Remover</button>
         </div>
-      </div>`;
-    }).join('');
-    el.querySelectorAll('[data-edit-aluno]').forEach(b=>b.addEventListener('click', ()=>openAlunoModal(b.dataset.editAluno)));
-    el.querySelectorAll('[data-del-aluno]').forEach(b=>b.addEventListener('click', async ()=>{
-      if(!confirm('Remover este aluno?')) return;
-      state.alunos = state.alunos.filter(a=>a.id!==b.dataset.delAluno);
-      await saveStateToFirebase();
-      renderAlunos();
-    }));
-  }
-  document.getElementById('btn-add-aluno').addEventListener('click', ()=>openAlunoModal(null));
-
-  function renderAvailEditor(container, disponibilidade){
-    container.innerHTML = DIAS.map(d=>{
-      const wins = disponibilidade[d.key] || [];
-      return `<div class="avail-day" data-day="${d.key}">
-        <div class="avail-day-head"><b style="font-size:13px;">${d.label}</b>
-          <button class="btn secondary small add-win" data-day="${d.key}">+ Janela</button></div>
-        <div class="wins">${wins.map((w,i)=>`<div class="avail-win" data-day="${d.key}" data-idx="${i}">
-          <input type="time" class="win-start" value="${w.start}"> — <input type="time" class="win-end" value="${w.end}">
-          <button class="btn danger small del-win">✕</button>
-        </div>`).join('')}</div>
-      </div>`;
-    }).join('');
-    container.querySelectorAll('.add-win').forEach(btn=>btn.addEventListener('click', ()=>{
-      const day = btn.dataset.day;
-      disponibilidade[day] = disponibilidade[day] || [];
-      disponibilidade[day].push({start:'18:00',end:'19:00'});
-      renderAvailEditor(container, disponibilidade);
-    }));
-    container.querySelectorAll('.del-win').forEach(btn=>btn.addEventListener('click', ()=>{
-      const row = btn.closest('.avail-win');
-      disponibilidade[row.dataset.day].splice(Number(row.dataset.idx),1);
-      renderAvailEditor(container, disponibilidade);
-    }));
-    container.querySelectorAll('.avail-win').forEach(row=>{
-      row.querySelector('.win-start').addEventListener('change', e=>{ disponibilidade[row.dataset.day][row.dataset.idx].start = e.target.value; });
-      row.querySelector('.win-end').addEventListener('change', e=>{ disponibilidade[row.dataset.day][row.dataset.idx].end = e.target.value; });
-    });
-  }
-
-  function openAlunoModal(alunoId){
-    const a = alunoId ? state.alunos.find(x=>x.id===alunoId) :
-      { id: uid(), nome:'', ptFixo:'qualquer', sessoesPorSemana:2, aceitaGrupo:false, disponibilidade:{} };
-    const disponibilidade = JSON.parse(JSON.stringify(a.disponibilidade||{}));
-    const ptOptions = `<option value="qualquer" ${a.ptFixo==='qualquer'?'selected':''}>Qualquer PT</option>` +
-      state.pts.map(p=>`<option value="${p.id}" ${a.ptFixo===p.id?'selected':''}>${p.nome}</option>`).join('');
-    
-    const html = `<h3>${alunoId?'Editar Aluno':'Novo Aluno'}</h3>
-      <div class="field"><label>Nome</label><input type="text" id="m-nome" value="${a.nome}"></div>
-      <div class="field-row">
-        <div class="field"><label>PT</label><select id="m-pt">${ptOptions}</select></div>
-        <div class="field"><label>Sessões/semana</label><input type="number" id="m-sessoes" min="1" value="${a.sessoesPorSemana}"></div>
       </div>
-      <label>Disponibilidade semanal</label>
-      <div id="m-avail"></div>
+    `).join('');
+    el.querySelectorAll('[data-del-aluno]').forEach(b=>b.addEventListener('click', async ()=>{
+      state.alunos = state.alunos.filter(a=>a.id!==b.dataset.delAluno);
+      await saveStateToFirebase(); renderAlunos();
+    }));
+  }
+
+  document.getElementById('btn-add-aluno').addEventListener('click', ()=>{
+    openModal(`
+      <h3>Novo Aluno</h3>
+      <div class="field"><label>Nome</label><input type="text" id="m-nome"></div>
+      <div class="field"><label>Sessões por semana</label><input type="number" id="m-sess" value="2"></div>
       <div class="modal-actions">
         <button class="btn secondary small" id="m-cancel">Cancelar</button>
         <button class="btn small" id="m-save">Guardar</button>
-      </div>`;
-    openModal(html, (root)=>{
-      renderAvailEditor(root.querySelector('#m-avail'), disponibilidade);
+      </div>
+    `, (root)=>{
       root.querySelector('#m-cancel').addEventListener('click', closeModal);
       root.querySelector('#m-save').addEventListener('click', async ()=>{
         const nome = root.querySelector('#m-nome').value.trim();
-        if(!nome){ alert('Indica o nome.'); return; }
-        a.nome = nome; a.ptFixo = root.querySelector('#m-pt').value;
-        a.sessoesPorSemana = Number(root.querySelector('#m-sessoes').value)||1;
-        a.disponibilidade = disponibilidade;
-        if(!alunoId) state.alunos.push(a);
+        if(!nome) return;
+        state.alunos.push({ id: uid(), nome, sessoes: Number(root.querySelector('#m-sess').value)||1 });
         const res = await saveStateToFirebase();
         closeModal(); renderAlunos();
-        showToast(res.ok ? 'Aluno guardado' : 'Erro ao guardar', res.ok);
+        showToast(res.ok ? 'Aluno adicionado!' : 'Erro ao guardar no Firebase', res.ok);
       });
     });
-  }
-
-  // ---------- HORÁRIOS & UTILS ----------
-  function currentWeekId(){
-    const inp = document.getElementById('input-semana');
-    if(inp.value) return inp.value;
-    const now = new Date();
-    const jan1 = new Date(now.getFullYear(),0,1);
-    const week = Math.ceil((((now - jan1)/86400000) + jan1.getDay()+1)/7);
-    const val = `${now.getFullYear()}-W${String(week).padStart(2,'0')}`;
-    inp.value = val; return val;
-  }
-
-  function renderHorarioView(){
-    currentWeekId();
-    const gridEl = document.getElementById('grid-container');
-    gridEl.innerHTML = `<div class="empty-state">Utiliza as vistas acima para configurar PTs, alunos e horários.</div>`;
-  }
-
-  function renderAll(){ renderGinasio(); renderPts(); renderAlunos(); renderHorarioView(); }
+  });
 </script>
 </body>
 </html>
